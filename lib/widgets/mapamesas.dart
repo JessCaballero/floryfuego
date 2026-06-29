@@ -17,25 +17,13 @@ class MapaMesas extends StatefulWidget {
 
   @override
   
-  State<MapaMesas> createState() => _MapaMesasState(
-    onMesaSeleccionada: onMesaSeleccionada,
-    fecha: fecha,
-    hora: hora
-  );
+  State<MapaMesas> createState() => _MapaMesasState();
 }
 
 class _MapaMesasState extends State<MapaMesas> {
-  final ValueChanged<int?>? onMesaSeleccionada;
-  final DateTime? fecha;
-  final TimeOfDay? hora;
 
   int? mesaSeleccionada;
   List<int> idsOcupados = []; 
-  _MapaMesasState({
-    required this.onMesaSeleccionada,
-    required this.fecha,
-    required this.hora,
-  });
 
   @override
   void initState() {
@@ -59,10 +47,10 @@ class _MapaMesasState extends State<MapaMesas> {
 
 
   Future<void> consultarOcupacionEnFS() async {
-    if (fecha == null || hora == null) return;
+    if (widget.fecha == null || widget.hora == null) return;
 
-  String f = "${fecha!.year}-${fecha!.month.toString().padLeft(2, '0')}-${fecha!.day.toString().padLeft(2, '0')}";
-  String h = "${hora!.hour.toString().padLeft(2, '0')}:${hora!.minute.toString().padLeft(2, '0')}:00";
+  String f = "${widget.fecha!.year}-${widget.fecha!.month.toString().padLeft(2, '0')}-${widget.fecha!.day.toString().padLeft(2, '0')}";
+  String h = "${widget.hora!.hour.toString().padLeft(2, '0')}:${widget.hora!.minute.toString().padLeft(2, '0')}:00";
 
     try {
       ApiService servicio = ApiService();
@@ -105,8 +93,8 @@ class _MapaMesasState extends State<MapaMesas> {
                           setState(() {
                             mesaSeleccionada = mesa['id'];
                           });
-                          if (onMesaSeleccionada != null) {
-                            onMesaSeleccionada!(mesa['id']);
+                          if (widget.onMesaSeleccionada != null) {
+                            widget.onMesaSeleccionada!(mesa['id']);
                           }
                         }
                       },

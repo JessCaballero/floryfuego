@@ -19,22 +19,10 @@ class Confirmacionreserva extends StatefulWidget {
   });
 
   @override
-  State<Confirmacionreserva> createState() => _ConfirmacionreservaState(
-        fecha,
-        hora,
-        personas,
-        mesa,
-      );
+   State<Confirmacionreserva> createState() => _ConfirmacionreservaState();
 }
 
 class _ConfirmacionreservaState extends State<Confirmacionreserva> {
-
-  final DateTime fecha;
-  final TimeOfDay hora;
-  final int personas;
-  final String mesa;
-
-  _ConfirmacionreservaState(this.fecha, this.hora, this.personas, this.mesa);
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final ApiService _apiService = ApiService();
@@ -65,17 +53,11 @@ class _ConfirmacionreservaState extends State<Confirmacionreserva> {
     if (_formKey.currentState!.validate()) {
       setState(() => _estaCargando = true);
 
-      await GuardadoLocal.guardarDatosUsuario(
-        _controladorNombre.text,
-        _controladorEmail.text,
-        _controladorTelefono.text,
-      );
-
       final nuevaReserva = ReservaModelo(
-        fecha: fecha,
-        hora: hora,
-        personas: personas,
-        mesa: mesa,
+        fecha: widget.fecha,
+        hora: widget.hora,
+        personas: widget.personas,
+        mesa: widget.mesa,
         nombre: _controladorNombre.text,
         email: _controladorEmail.text,
         telefono: _controladorTelefono.text,
@@ -85,19 +67,20 @@ class _ConfirmacionreservaState extends State<Confirmacionreserva> {
     try {
       String? idResult = await _apiService.guardarReserva(nuevaReserva);
       if (idResult != null) {
-     
         await GuardadoLocal.guardarDatosUsuario(
           nuevaReserva.nombre, 
           nuevaReserva.email, 
           nuevaReserva.telefono
         );
         final reservaFinal = nuevaReserva.copyWith(id: idResult);
+        if(!mounted) return; 
         Navigator.pushAndRemoveUntil(context,
           MaterialPageRoute(builder: (context) => Reservarealizada(reserva: reservaFinal)),
           (route) => false,
         );
       }
     } catch (e) {
+      if(!mounted) return; 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error al conectar con FS: $e")),
       );
